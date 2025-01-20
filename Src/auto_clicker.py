@@ -8,7 +8,7 @@ mouse = Controller()
 
 # Settings
 clicking = False  # Start with clicking disabled
-delay = 0.05 # Delay between clicks (in seconds)
+delay = 0.01  # Delay between clicks (in seconds)
 
 # Clicker function
 def clicker():
