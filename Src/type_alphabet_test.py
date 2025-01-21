@@ -12,7 +12,7 @@ alphabet = "bcdefghijklmnopqrstuvwxyz"
 def type_alphabet():
     for letter in alphabet:
         keyboard_controller.type(letter)  # Simulate typing the letter
-        time.sleep(0.001)  # Small delay to simulate typing speed
+        time.sleep(0.1)  # Small delay to simulate typing speed
 
 # Listener function for key press
 def on_press(key):
