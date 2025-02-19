@@ -137,6 +137,85 @@ def delete_task():
         update_task_listbox(project_name)
         messagebox.showinfo("Success", f"Task '{task_text}' deleted!")
 
+# Edit a task using the current project
+def edit_task():
+    global current_project
+    if not current_project:
+        messagebox.showwarning("Warning", "Please select a project first!")
+        return
+
+    project_name = current_project
+    projects = load_projects()
+    tasks = projects.get(project_name, [])
+
+    selected_task = task_listbox.curselection()
+    if not selected_task:
+        messagebox.showwarning("Warning", "Please select a task to edit!")
+        return
+
+    task_index = selected_task[0]
+    task_data = tasks[task_index]
+
+    # Parse current start and end datetime values
+    start_dt = datetime.strptime(task_data["start"], "%d.%m.%Y %H:%M")
+    end_dt = datetime.strptime(task_data["end"], "%d.%m.%Y %H:%M")
+
+    # Create a dialog for editing the task
+    dialog = tk.Toplevel(root)
+    dialog.title("Edit Task")
+
+    # Task name
+    tk.Label(dialog, text="Task Name:").pack(pady=5)
+    name_entry = tk.Entry(dialog)
+    name_entry.insert(0, task_data["task"])
+    name_entry.pack(pady=5)
+
+    # Start date and time
+    tk.Label(dialog, text="Select Start Date:").pack(pady=5)
+    start_date_entry = DateEntry(dialog, date_pattern='dd.mm.yyyy')
+    start_date_entry.set_date(start_dt)
+    start_date_entry.pack(pady=5)
+
+    tk.Label(dialog, text="Enter Start Time (HH:MM):").pack(pady=5)
+    start_time_entry = tk.Entry(dialog)
+    start_time_entry.insert(0, start_dt.strftime("%H:%M"))
+    start_time_entry.pack(pady=5)
+
+    # End date and time
+    tk.Label(dialog, text="Select End Date:").pack(pady=5)
+    end_date_entry = DateEntry(dialog, date_pattern='dd.mm.yyyy')
+    end_date_entry.set_date(end_dt)
+    end_date_entry.pack(pady=5)
+
+    tk.Label(dialog, text="Enter End Time (HH:MM):").pack(pady=5)
+    end_time_entry = tk.Entry(dialog)
+    end_time_entry.insert(0, end_dt.strftime("%H:%M"))
+    end_time_entry.pack(pady=5)
+
+    def submit_edit():
+        new_name = name_entry.get()
+        new_start_date = start_date_entry.get_date()
+        new_start_time = start_time_entry.get()
+        new_end_date = end_date_entry.get_date()
+        new_end_time = end_time_entry.get()
+
+        # Construct new datetime strings in the required format
+        new_start_datetime = f"{new_start_date.strftime('%d.%m.%Y')} {new_start_time}"
+        new_end_datetime = f"{new_end_date.strftime('%d.%m.%Y')} {new_end_time}"
+
+        # Update the task with new values
+        tasks[task_index] = {
+            "task": new_name,
+            "start": new_start_datetime,
+            "end": new_end_datetime
+        }
+        save_projects(projects)
+        update_task_listbox(project_name)
+        messagebox.showinfo("Success", f"Task '{new_name}' updated successfully!")
+        dialog.destroy()
+
+    tk.Button(dialog, text="Submit", command=submit_edit).pack(pady=10)
+
 # Update the task listbox when a project is selected
 def update_task_listbox(project_name):
     tasks = load_projects().get(project_name, [])
@@ -163,7 +242,7 @@ def show_gantt_chart():
         messagebox.showwarning("Warning", "No tasks in this project!")
         return
 
- # Sort tasks by start date
+    # Sort tasks by start date
     tasks.sort(key=lambda task: datetime.strptime(task["start"], "%d.%m.%Y %H:%M"))
     
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -275,6 +354,9 @@ btn_add_task.pack(side=tk.LEFT, padx=5)
 
 btn_delete_task = tk.Button(btn_frame, text="Delete Task", command=delete_task)
 btn_delete_task.pack(side=tk.LEFT, padx=5)
+
+btn_edit_task = tk.Button(btn_frame, text="Edit Task", command=edit_task)
+btn_edit_task.pack(side=tk.LEFT, padx=5)
 
 btn_show_chart = tk.Button(btn_frame, text="Show Gantt Chart", command=show_gantt_chart)
 btn_show_chart.pack(side=tk.LEFT, padx=5)
