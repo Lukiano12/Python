@@ -140,6 +140,10 @@ def delete_task():
 # Update the task listbox when a project is selected
 def update_task_listbox(project_name):
     tasks = load_projects().get(project_name, [])
+
+    # Sort tasks by start date
+    tasks.sort(key=lambda task: datetime.strptime(task["start"], "%d.%m.%Y %H:%M"))
+
     task_listbox.delete(0, tk.END)
     for task in tasks:
         task_listbox.insert(tk.END, f"{task['task']} ({task['start']} - {task['end']})")
@@ -159,6 +163,9 @@ def show_gantt_chart():
         messagebox.showwarning("Warning", "No tasks in this project!")
         return
 
+ # Sort tasks by start date
+    tasks.sort(key=lambda task: datetime.strptime(task["start"], "%d.%m.%Y %H:%M"))
+    
     fig, ax = plt.subplots(figsize=(10, 6))
     task_labels = []
 
