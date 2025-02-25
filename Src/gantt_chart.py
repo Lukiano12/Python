@@ -6,6 +6,8 @@ from tkcalendar import Calendar, DateEntry  # Imports calendar widgets to allow 
 from datetime import datetime  # Provides classes for manipulating dates and times
 import matplotlib.pyplot as plt  # Imports Matplotlib's pyplot module for plotting graphs
 import matplotlib.dates as mdates  # Provides functions to handle dates on Matplotlib plots
+import textwrap
+
 
 # Define the path for JSON storage.
 # BASE_DIR is set to the parent directory of the directory containing this file.
@@ -304,6 +306,8 @@ def show_gantt_chart():
     fig, ax = plt.subplots(figsize=(10, 6))
     task_labels = []  # List to store task names for labeling the y-axis.
 
+    
+
     # Loop through the tasks and add a horizontal bar for each.
     for i, task in enumerate(tasks):
         task_labels.append(task["task"])
@@ -319,7 +323,9 @@ def show_gantt_chart():
 
     # Set the y-axis ticks and labels based on the number of tasks.
     ax.set_yticks(range(len(task_labels)))
-    ax.set_yticklabels(task_labels)
+    max_chars_per_line = 20  # You can tweak this number to suit your label lengths.
+    wrapped_labels = [textwrap.fill(label, width=max_chars_per_line) for label in task_labels]
+    ax.set_yticklabels(wrapped_labels)
     # Invert the y-axis so that tasks are listed from top to bottom.
     ax.invert_yaxis()
     
