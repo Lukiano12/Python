@@ -1,29 +1,7 @@
 {
-    "Projecto": [
-        {
-            "task": "one",
-            "start": "18.02.2025 07:00",
-            "end": "18.02.2025 10:00"
-        },
-        {
-            "task": "two",
-            "start": "18.02.2025 10:00",
-            "end": "18.02.2025 12:00"
-        },
-        {
-            "task": "three",
-            "start": "18.02.2025 11:45",
-            "end": "18.02.2025 13:43"
-        },
-        {
-            "task": "four",
-            "start": "18.02.2025 13:50",
-            "end": "18.02.2025 13:55"
-        }
-    ],
     "T3000 Hausarbeit": [
         {
-            "task": "Materialbesorgung",
+            "task": "Materialbeschaffung",
             "start": "21.01.2025 07:00",
             "end": "21.02.2025 00:00"
         },
@@ -34,8 +12,23 @@
         },
         {
             "task": "Software BPC",
-            "start": "26.02.2025 07:00",
-            "end": "27.02.2025 00:00"
+            "start": "05.03.2025 07:00",
+            "end": "07.03.2025 07:00"
+        },
+        {
+            "task": "Dokumentation T3000 Hausarbeit",
+            "start": "19.01.2025 00:00",
+            "end": "14.04.2025 00:00"
+        },
+        {
+            "task": "Inbetriebnahme",
+            "start": "10.03.2025 00:00",
+            "end": "14.04.2025 00:00"
+        },
+        {
+            "task": "Dokumentation zu den Bauteilen",
+            "start": "20.01.2025 07:00",
+            "end": "10.02.2025 00:00"
         }
     ]
 }

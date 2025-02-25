@@ -155,141 +155,130 @@ def add_task():
     btn_add_task = tk.Button(dialog, text="Submit Task", command=submit_task)
     btn_add_task.pack(pady=10)
 
+
+def get_sorted_tasks(project_name):
+    tasks = load_projects().get(project_name, [])
+    return sorted(tasks, key=lambda task: datetime.strptime(task["start"], "%d.%m.%Y %H:%M"))
+
+
+
 # Function to delete a selected task from the current project.
 def delete_task():
-    global current_project  # Use the global current_project variable.
+    global current_project
     if not current_project:
-        # Warn the user if no project is selected.
         messagebox.showwarning("Warning", "Please select a project first!")
         return
 
-    project_name = current_project  # Get the current project name.
-    projects = load_projects()  # Load projects data.
-    tasks = projects.get(project_name, [])  # Retrieve the list of tasks for the project.
+    project_name = current_project
+    projects = load_projects()
+    tasks = projects.get(project_name, [])
+    sorted_tasks = sorted(tasks, key=lambda task: datetime.strptime(task["start"], "%d.%m.%Y %H:%M"))
 
-    # Get the selected task index from the task listbox.
     selected_task = task_listbox.curselection()
     if not selected_task:
-        # Warn the user if no task is selected.
         messagebox.showwarning("Warning", "Please select a task to delete!")
         return
 
-    # Get the text of the selected task.
-    task_text = task_listbox.get(selected_task[0])
-    # Ask the user to confirm deletion of the selected task.
-    confirm = messagebox.askyesno("Confirm", f"Are you sure you want to delete:\n{task_text}?")
+    selected_index = selected_task[0]
+    task_data = sorted_tasks[selected_index]
+    original_index = tasks.index(task_data)
+
+    confirm = messagebox.askyesno("Confirm", f"Are you sure you want to delete:\n{task_data['task']}?")
     if confirm:
-        # Remove the task from the tasks list.
-        tasks.pop(selected_task[0])
-        # Save the updated projects data.
+        tasks.pop(original_index)
         save_projects(projects)
-        # Refresh the task listbox in the GUI.
         update_task_listbox(project_name)
-        # Inform the user that the task was deleted.
-        messagebox.showinfo("Success", f"Task '{task_text}' deleted!")
+        messagebox.showinfo("Success", f"Task '{task_data['task']}' deleted!")
+
 
 # Function to edit an existing task in the current project.
 def edit_task():
-    global current_project  # Use the global current_project variable.
+    global current_project
     if not current_project:
-        # Warn the user if no project is selected.
         messagebox.showwarning("Warning", "Please select a project first!")
         return
 
-    project_name = current_project  # Get the current project name.
-    projects = load_projects()  # Load projects data.
-    tasks = projects.get(project_name, [])  # Retrieve the list of tasks for the project.
+    project_name = current_project
+    projects = load_projects()
+    # Get the original unsorted tasks list.
+    tasks = projects.get(project_name, [])
+    # Create a sorted copy for display.
+    sorted_tasks = sorted(tasks, key=lambda task: datetime.strptime(task["start"], "%d.%m.%Y %H:%M"))
 
-    # Get the selected task index from the task listbox.
     selected_task = task_listbox.curselection()
     if not selected_task:
-        # Warn the user if no task is selected.
         messagebox.showwarning("Warning", "Please select a task to edit!")
         return
 
-    task_index = selected_task[0]  # Determine the index of the selected task.
-    task_data = tasks[task_index]  # Retrieve the task data from the list.
+    selected_index = selected_task[0]
+    # Get the task data from the sorted list.
+    task_data = sorted_tasks[selected_index]
+    # Find its index in the original tasks list.
+    original_index = tasks.index(task_data)
 
     # Convert the stored start and end datetime strings into datetime objects.
     start_dt = datetime.strptime(task_data["start"], "%d.%m.%Y %H:%M")
     end_dt = datetime.strptime(task_data["end"], "%d.%m.%Y %H:%M")
 
-    # Create a new dialog window for editing the task.
     dialog = tk.Toplevel(root)
     dialog.title("Edit Task")
 
-    # --- Task Name ---
     tk.Label(dialog, text="Task Name:").pack(pady=5)
     name_entry = tk.Entry(dialog)
-    name_entry.insert(0, task_data["task"])  # Pre-fill with the current task name.
+    name_entry.insert(0, task_data["task"])
     name_entry.pack(pady=5)
 
-    # --- Start Date and Time ---
     tk.Label(dialog, text="Select Start Date:").pack(pady=5)
     start_date_entry = DateEntry(dialog, date_pattern='dd.mm.yyyy')
-    start_date_entry.set_date(start_dt)  # Set the current start date.
+    start_date_entry.set_date(start_dt)
     start_date_entry.pack(pady=5)
 
     tk.Label(dialog, text="Enter Start Time (HH:MM):").pack(pady=5)
     start_time_entry = tk.Entry(dialog)
-    start_time_entry.insert(0, start_dt.strftime("%H:%M"))  # Pre-fill with the current start time.
+    start_time_entry.insert(0, start_dt.strftime("%H:%M"))
     start_time_entry.pack(pady=5)
 
-    # --- End Date and Time ---
     tk.Label(dialog, text="Select End Date:").pack(pady=5)
     end_date_entry = DateEntry(dialog, date_pattern='dd.mm.yyyy')
-    end_date_entry.set_date(end_dt)  # Set the current end date.
+    end_date_entry.set_date(end_dt)
     end_date_entry.pack(pady=5)
 
     tk.Label(dialog, text="Enter End Time (HH:MM):").pack(pady=5)
     end_time_entry = tk.Entry(dialog)
-    end_time_entry.insert(0, end_dt.strftime("%H:%M"))  # Pre-fill with the current end time.
+    end_time_entry.insert(0, end_dt.strftime("%H:%M"))
     end_time_entry.pack(pady=5)
 
-    # Function to handle submission of the edited task details.
     def submit_edit():
-        # Retrieve updated values from the input fields.
         new_name = name_entry.get()
         new_start_date = start_date_entry.get_date()
         new_start_time = start_time_entry.get()
         new_end_date = end_date_entry.get_date()
         new_end_time = end_time_entry.get()
 
-        # Construct new datetime strings in the desired format.
         new_start_datetime = f"{new_start_date.strftime('%d.%m.%Y')} {new_start_time}"
         new_end_datetime = f"{new_end_date.strftime('%d.%m.%Y')} {new_end_time}"
 
-        # Update the task data with the new values.
-        tasks[task_index] = {
+        # Update the task in the original tasks list.
+        tasks[original_index] = {
             "task": new_name,
             "start": new_start_datetime,
             "end": new_end_datetime
         }
-        # Save the updated projects data.
         save_projects(projects)
-        # Refresh the task listbox to show the updated task.
         update_task_listbox(project_name)
-        # Inform the user that the task was updated.
         messagebox.showinfo("Success", f"Task '{new_name}' updated successfully!")
-        # Close the edit dialog window.
         dialog.destroy()
 
-    # Button to submit the edited task; it calls submit_edit when clicked.
     tk.Button(dialog, text="Submit", command=submit_edit).pack(pady=10)
+
 
 # Function to update the task listbox to show all tasks for a given project.
 def update_task_listbox(project_name):
-    # Retrieve the tasks for the specified project.
-    tasks = load_projects().get(project_name, [])
-
-    # Sort tasks by their start datetime for a chronological display.
-    tasks.sort(key=lambda task: datetime.strptime(task["start"], "%d.%m.%Y %H:%M"))
-
-    # Clear the current contents of the task listbox.
+    sorted_tasks = get_sorted_tasks(project_name)
     task_listbox.delete(0, tk.END)
-    # Insert each task into the listbox with its name and start/end times.
-    for task in tasks:
+    for task in sorted_tasks:
         task_listbox.insert(tk.END, f"{task['task']} ({task['start']} - {task['end']})")
+
 
 # Function to display a Gantt chart for the selected project using Matplotlib.
 def show_gantt_chart():
